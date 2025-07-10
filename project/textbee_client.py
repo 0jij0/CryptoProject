@@ -12,6 +12,7 @@ class TextBeeClient:
             "recipients": [phone_number],
             "message": message
         }
+        
         headers = {"x-api-key": self.api_key}
         response = requests.post(url, json=payload, headers=headers)
         return response.json()

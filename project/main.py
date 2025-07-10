@@ -24,8 +24,8 @@ sms_resp = tb.send_sms(PHONE_NUMBER, sms_body)
 print("\nTextBee API Response:\n", sms_resp)
 
 # --- Wait and fetch incoming SMS ---
-print("\nWaiting 15 seconds for reply...")
-time.sleep(15)
+print("\nWaiting 30 seconds for reply...")
+time.sleep(30)
 
 incoming = tb.fetch_incoming_sms()
 sms_data = incoming.get("data", [])
