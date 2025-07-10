@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CryptoProject SMS OTP Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, button { margin: 5px 0; padding: 8px; width: 300px; }
+        form { margin-bottom: 30px; }
+        #encryptedResult, #decryptedResult, #infoMsg { margin-top: 10px; font-weight: bold; }
+        .instructions { background: #f0f0f0; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .example { color: #555; font-size: 0.95em; }
+    </style>
+</head>
+<body>
+    <h1>CryptoProject SMS OTP Demo</h1>
+    <div class="instructions">
+        <strong>How to use:</strong><br>
+        {{ instructions|safe }}
+        <div class="example">
+            <br><strong>Example message:</strong> "{{ example_message }}"
+        </div>
+    </div>
+    <h2>Encrypt and Send OTP</h2>
+    <form id="encryptForm">
+        <input type="text" name="phone_number" placeholder="Enter phone number (e.g. +254...)" required>
+        <input type="text" name="message" placeholder="Enter message" required>
+        <button type="submit">Encrypt & Send OTP</button>
+    </form>
+    <div id="infoMsg"></div>
+    <div id="encryptedResult"></div>
+
+    <h2>Decrypt Message</h2>
+    <form id="decryptForm">
+        <input type="text" name="encrypted" placeholder="Encrypted message" required>
+        <input type="text" name="otp" placeholder="OTP" required>
+        <button type="submit">Decrypt</button>
+    </form>
+    <div id="decryptedResult"></div>
+
+    <script>
+        document.getElementById('encryptForm').onsubmit = async function(e) {
+            e.preventDefault();
+            document.getElementById('infoMsg').innerText = '';
+            document.getElementById('encryptedResult').innerText = '';
+            const formData = new FormData(this);
+            const response = await fetch('/send', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.encrypted) {
+                document.getElementById('infoMsg').innerText = data.info;
+                document.getElementById('encryptedResult').innerText =
+                    'Encrypted: ' + data.encrypted;
+                // Do NOT autofill the OTP field
+                document.querySelector('input[name="encrypted"]').value = data.encrypted;
+            } else {
+                document.getElementById('infoMsg').innerText = 'Error: ' + (data.error || 'Could not encrypt.');
+            }
+        };
+
+        document.getElementById('decryptForm').onsubmit = async function(e) {
+            e.preventDefault();
+            document.getElementById('decryptedResult').innerText = '';
+            const formData = new FormData(this);
+            const response = await fetch('/decrypt', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.decrypted) {
+                document.getElementById('decryptedResult').innerText = 'Decrypted: ' + data.decrypted;
+            } else {
+                document.getElementById('decryptedResult').innerText = 'Error: ' + (data.error || 'Could not decrypt.');
+            }
+        };
+    </script>
+</body>
+</html>
